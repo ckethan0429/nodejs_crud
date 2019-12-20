@@ -1,0 +1,25 @@
+{
+  "name": "web1_html_internet",
+  "version": "1.0.0",
+  "description": "query string은 ?로 시작하고",
+  "main": "main.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ckethan0429/nodejs_crud.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ckethan0429/nodejs_crud/issues"
+  },
+  "homepage": "https://github.com/ckethan0429/nodejs_crud#readme",
+  "dependencies": {
+    "sanitize-html": "^1.20.1"
+  }
+}
