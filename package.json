@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/ckethan0429/nodejs_crud#readme",
   "dependencies": {
+    "mysql": "^2.17.1",
     "sanitize-html": "^1.20.1"
   }
 }

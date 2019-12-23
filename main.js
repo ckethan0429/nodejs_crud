@@ -5,14 +5,20 @@ var qs = require('querystring');
 var template = require('./lib/template.js');
 var path = require('path');
 var sanitizeHtml = require('sanitize-html');
+var mysql = require('mysql');
+var db = mysql.createConnection({
+    host    :   'localhost',
+    user    :   'root',
+    password:   '0000',
+    database:   'opentutorials'
+});
+db.connect();
 
 var app = http.createServer(function(request,response){
     var _url = request.url;
-    var fs = require('fs');
     var queryData = url.parse(_url, true).query;
     var pathname = url.parse(_url, true).pathname;
     //queryData를 통하여 주소값 불러오기
-    var title = queryData.id;
     
     //정보를 반드시 찍어보기.
     //console.log(url.parse(_url, true));
@@ -20,12 +26,11 @@ var app = http.createServer(function(request,response){
     if(pathname == '/'){
         //id가 없을 때
         if(queryData.id === undefined){
-            fs.readdir('./data', function(err, filelist){
-                //console.log(filelist);
+            db.query(`SELECT * FROM topic`, function(error, topics){
                 var title = 'Welcome';
                 var description = 'Hello, Node.js';
                
-                var list = template.list(filelist);
+                var list = template.list(topics);
                 var html = template.HTML(title,list,
                     `<h2>${title}</h2>${description}`,
                     `<a href="/create">create</a>`,
@@ -33,23 +38,23 @@ var app = http.createServer(function(request,response){
                 response.writeHead(200);
                 response.end(html);
             });
-
                         
         //id가 존재할때  
         }else{
-            fs.readdir('./data', function(err, filelist){
-                //console.log(filelist); 
-                var filteredId = path.parse(queryData.id).base;
-                fs.readFile(`data/${filteredId}`, 'utf8', function(err, description){
-                    var sanitizedTitle = sanitizeHtml(title);
-                    var sanitizedDescription = sanitizeHtml(description);
-                    var list = template.list(filelist); 
-                    var html = template.HTML(sanitizedTitle,list,
-                        `<h2>${sanitizedTitle}</h2>${sanitizedDescription}`,
+            db.query(`SELECT * FROM topic`, function(error, topics){
+                if(error) throw error;
+                db.query(`SELECT * FROM topic WHERE id=?`, [queryData.id], function(error2, topic){
+                    if(error2) throw error2;
+                    var title = topic[0].title;
+                    var description = topic[0].description;
+            
+                    var list = template.list(topics);
+                    var html = template.HTML(title,list,
+                        `<h2>${title}</h2>${description}`,
                         `<a href="/create">create</a> 
-                        <a href="/update?id=${sanitizedTitle}">update</a> 
+                        <a href="/update?id=${queryData.id}">update</a> 
                         <form action="delete_process" method="post">
-                            <input type="hidden" name="id" value="${sanitizedTitle}">
+                            <input type="hidden" name="id" value="${queryData.id}">
                             <input type="submit" value="delete">
                         </form>
                         `,
@@ -58,6 +63,7 @@ var app = http.createServer(function(request,response){
                     response.end(html);
                 });
             });
+
         } 
     } else if(pathname === '/create'){
         
